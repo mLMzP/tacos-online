@@ -1,8 +1,10 @@
 package com.lm2a.tacosonline.web;
 
 
+import com.lm2a.tacosonline.data.OrderRepository;
 import com.lm2a.tacosonline.model.Order;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -20,6 +22,9 @@ import javax.validation.Valid;
 @SessionAttributes("order")
 public class OrderController {
 
+    @Autowired
+    private OrderRepository orderRepository;
+
     @GetMapping("/current")
     public String orderForm(Model model){
         return "orderForm";
@@ -31,6 +36,7 @@ public class OrderController {
             return "orderForm";
         }
         log.info("Order Processing Started: " + order);
+        orderRepository.save(order);
         return "redirect:/";
     }
 

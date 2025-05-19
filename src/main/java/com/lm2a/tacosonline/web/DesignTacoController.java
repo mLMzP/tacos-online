@@ -2,6 +2,7 @@ package com.lm2a.tacosonline.web;
 
 
 import com.lm2a.tacosonline.data.IngredientRepository;
+import com.lm2a.tacosonline.data.TacoRepository;
 import com.lm2a.tacosonline.model.Ingredient;
 import com.lm2a.tacosonline.model.Ingredient.Type;
 import com.lm2a.tacosonline.model.Order;
@@ -26,8 +27,14 @@ import java.util.stream.Collectors;
 @SessionAttributes("order")
 public class DesignTacoController {
 
-    @Autowired
     private IngredientRepository ingredientRepo;
+
+    private TacoRepository tacoRepo;
+
+    public DesignTacoController(IngredientRepository ingredientRepo, TacoRepository tacoRepo) {
+        this.ingredientRepo = ingredientRepo;
+        this.tacoRepo = tacoRepo;
+    }
 
     @GetMapping
     public String showDesignForm(Model model){
@@ -59,7 +66,10 @@ public class DesignTacoController {
             fillIngredients(model);
             return "design";
         }
-        log.info("Processing Design Taco: "+design);
+
+        Taco saved = tacoRepo.save(design);
+        log.info("Processing Design Taco: "+saved);
+
         order.addDesign(design);
 
         return "redirect:/orders/current";
