@@ -3,15 +3,13 @@ package com.lm2a.tacosonline.web;
 
 import com.lm2a.tacosonline.model.Ingredient;
 import com.lm2a.tacosonline.model.Ingredient.Type;
+import com.lm2a.tacosonline.model.Order;
 import com.lm2a.tacosonline.model.Taco;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -23,26 +21,42 @@ import java.util.stream.Collectors;
 @Slf4j
 @Controller
 @RequestMapping("/design")
+@SessionAttributes("order")
 public class DesignTacoController {
 
     @GetMapping
     public String showDesignForm(Model model){
         fillIngredients(model);
-        model.addAttribute("tktn", new Taco());
+        //model.addAttribute("tktn", new Taco());
         return "design";
     }
+
+    @ModelAttribute(name="tktn")
+    public Taco taco(){
+        log.info("Iniciando Taco");
+        return new Taco();
+    }
+
+    @ModelAttribute
+    public Order order(){
+        log.info("Iniciando Taco");
+        return new Order();
+    }
+
 
     private List<Ingredient> filterByType(List<Ingredient> ingredients, Type type) {
         return ingredients.stream().filter(ingredient -> ingredient.getType().equals(type)).collect(Collectors.toList());
     }
 
     @PostMapping
-    public String processDesign(@Valid @ModelAttribute(name="tktn") Taco design, Errors errors, Model model){
+    public String processDesign(@Valid @ModelAttribute(name="tktn") Taco design, Errors errors, Model model, @ModelAttribute Order order){
         if(errors.hasErrors()){
             fillIngredients(model);
             return "design";
         }
         log.info("Processing Design Taco: "+design);
+        order.addDesign(design);
+
         return "redirect:/orders/current";
     }
 
