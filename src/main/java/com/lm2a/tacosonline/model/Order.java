@@ -4,6 +4,7 @@ package com.lm2a.tacosonline.model;
 import lombok.Data;
 import org.hibernate.validator.constraints.CreditCardNumber;
 
+import javax.persistence.*;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Negative;
 import javax.validation.constraints.NotBlank;
@@ -13,11 +14,13 @@ import java.util.Date;
 import java.util.List;
 
 @Data
+@Entity
+@Table(name="Taco_Order")
 public class Order {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Date placedAt;
-
     @NotBlank(message="El nombre es obligatorio")
     private String deliveryName;
     @NotBlank(message="La calle es obligatoria")
@@ -35,9 +38,15 @@ public class Order {
     @Digits(integer = 3, fraction = 0, message="CVV invalido")
     private String ccCVV;
 
+    @ManyToMany(targetEntity = Taco.class)
     private List<Taco> tacos = new ArrayList<>();
 
     public void addDesign(Taco design){
         tacos.add(design);
+    }
+
+    @PrePersist
+    void placedAt(){
+        this.placedAt = new Date();
     }
 }
