@@ -45,5 +45,18 @@ public class ApiTacosController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+//    @DeleteMapping("/tacos/{id}")
+//    public void deleteTaco(@PathVariable("id") Long id){
+//        tacoRepository.deleteById(id);
+//    }
 
+    @DeleteMapping("/tacos/{id}")
+    public ResponseEntity<Taco> deleteTaco(@PathVariable("id") Long id) {
+        Optional<Taco> optTaco = tacoRepository.findById(id);
+        if(optTaco.isPresent()) {
+            tacoRepository.deleteById(id);
+            return new ResponseEntity<>(optTaco.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 }
