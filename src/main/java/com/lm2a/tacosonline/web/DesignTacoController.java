@@ -38,6 +38,8 @@ public class DesignTacoController {
 
     @GetMapping
     public String showDesignForm(Model model){
+        int x = 0;
+        int y = 1/x;
         fillIngredients(model);
         //model.addAttribute("tktn", new Taco());
         return "design";
