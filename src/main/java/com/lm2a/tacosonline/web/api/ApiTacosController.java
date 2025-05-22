@@ -2,8 +2,11 @@ package com.lm2a.tacosonline.web.api;
 
 
 import com.lm2a.tacosonline.data.TacoRepository;
+import com.lm2a.tacosonline.exceptions.TacoNotFoundException;
 import com.lm2a.tacosonline.model.Taco;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,5 +61,33 @@ public class ApiTacosController {
             return new ResponseEntity<>(optTaco.get(), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+//    @PutMapping("/tacos")
+//    public ResponseEntity<Taco> updateTaco(@RequestBody Taco taco) throws TacoNotFoundException {
+//            tacoRepository.findById(taco.getId()).orElseThrow(()->new TacoNotFoundException());
+//            tacoRepository.save(taco);
+//            return new ResponseEntity<>(taco, HttpStatus.OK);
+//    }
+
+    @PutMapping("/tacos")
+
+    public ResponseEntity<Taco> updateTaco(@RequestBody Taco taco){
+        tacoRepository.findById(taco.getId()).orElseThrow(()->new TacoNotFoundException("Taco", "id", taco.getId()));
+        tacoRepository.save(taco);
+        return new ResponseEntity<>(taco, HttpStatus.OK);
+
+    }
+
+
+    @GetMapping("/tacos")
+    public ResponseEntity<Iterable<Taco>> getAllTacos() {
+        return new ResponseEntity<>(tacoRepository.findAll(),HttpStatus.OK);
+    }
+
+    @GetMapping("/tacos/recents/{page}")
+    public ResponseEntity<Iterable<Taco>> getAllTacosOderedAndPaged(@PathVariable("page") Integer page) {
+        PageRequest pageRequest = PageRequest.of(page, 5,  Sort.by("createdAt").descending());
+        return new ResponseEntity<>(tacoRepository.findAll(pageRequest),HttpStatus.OK);
     }
 }
